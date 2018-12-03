@@ -1,20 +1,31 @@
+from collections import namedtuple
+
 from aoc_input import AOCInput
 
 INP = AOCInput(3)
 
+Rectangle = namedtuple('Rectangle', 'name x y width height')
 
-def part_a():
-    claimed = set()
-    double_claimed = set()
+RECTANGLES = []
+
+
+def parse_rects():
     for line in INP.value.split('\n'):
         # "#1 @ 257,829: 10x23"
         words = line.split()
-        x, y = words[2].rstrip(':').split(',')
-        w, h = words[3].split('x')
-        x, y, w, h = int(x), int(y), int(w), int(h)
-        for xi in range(x, x + w):
-            for yi in range(y, y + h):
-                inch = (xi, yi)
+        name = words[0].lstrip("#")
+        x, y = (int(n) for n in words[2].rstrip(':').split(','))
+        w, h = (int(n) for n in words[3].split('x'))
+        RECTANGLES.append(Rectangle(name, x, y, w, h))
+
+
+def part_a():  # O(nwh), where n is the number of rectangles and w/h are the average width and height
+    claimed = set()
+    double_claimed = set()
+    for rect in RECTANGLES:
+        for x in range(rect.x, rect.x + rect.width):
+            for y in range(rect.y, rect.y + rect.height):
+                inch = (x, y)
                 if inch in claimed:
                     double_claimed.add(inch)
                 else:
@@ -22,43 +33,34 @@ def part_a():
     return len(double_claimed)
 
 
-def part_b():
+def part_b():  # O(nwh), where n is the number of rectangles and w/h are the average width and height
     claimed = dict()
-    for line in INP.value.split('\n'):
-        # "#1 @ 257,829: 10x23"
-        words = line.split()
-        name = words[0].lstrip("#")
-        x, y = words[2].rstrip(':').split(',')
-        w, h = words[3].split('x')
-        x, y, w, h = int(x), int(y), int(w), int(h)
-
-        for xi in range(x, x + w):
-            for yi in range(y, y + h):
-                inch = (xi, yi)
+    for rect in RECTANGLES:
+        for x in range(rect.x, rect.x + rect.width):
+            for y in range(rect.y, rect.y + rect.height):
+                inch = (x, y)
                 if inch in claimed:
-                    claimed[inch] = 'BAD'
+                    claimed[inch] = 'BAD'  # it's disputed... no ID may own it.
                 else:
-                    claimed[inch] = name
+                    claimed[inch] = rect.name  # staking a claim
 
-    for line in INP.value.split('\n'):
-        # "#1 @ 257,829: 10x23"
-        words = line.split()
-        name = words[0].lstrip("#")
-        x, y = words[2].rstrip(':').split(',')
-        w, h = words[3].split('x')
-        x, y, w, h = int(x), int(y), int(w), int(h)
-
+    for rect in RECTANGLES:
         perfect = True
-        for xi in range(x, x + w):
-            for yi in range(y, y + h):
-                inch = (xi, yi)
-                if claimed[inch] != name:
+        for x in range(rect.x, rect.x + rect.width):
+            for y in range(rect.y, rect.y + rect.height):
+                inch = (x, y)
+                if claimed[inch] != rect.name:  # every inch needs to be named for this section
                     perfect = False
+                    break
 
-        if perfect:
-            return name
+            if not perfect:
+                break
+
+        if perfect:  # exactly one...
+            return rect.name
 
 
 if __name__ == '__main__':
+    parse_rects()
     print(part_a())
     print(part_b())
