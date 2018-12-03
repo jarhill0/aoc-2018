@@ -19,41 +19,38 @@ def parse_rects():
         RECTANGLES.append(Rectangle(name, x, y, w, h))
 
 
+def rect_iter(rect):
+    for x in range(rect.x, rect.x + rect.width):
+        for y in range(rect.y, rect.y + rect.height):
+            yield (x, y)
+
+
 def part_a():  # O(nwh), where n is the number of rectangles and w/h are the average width and height
     claimed = set()
     double_claimed = set()
     for rect in RECTANGLES:
-        for x in range(rect.x, rect.x + rect.width):
-            for y in range(rect.y, rect.y + rect.height):
-                inch = (x, y)
-                if inch in claimed:
-                    double_claimed.add(inch)
-                else:
-                    claimed.add(inch)
+        for inch in rect_iter(rect):
+            if inch in claimed:
+                double_claimed.add(inch)
+            else:
+                claimed.add(inch)
     return len(double_claimed)
 
 
 def part_b():  # O(nwh), where n is the number of rectangles and w/h are the average width and height
     claimed = dict()
     for rect in RECTANGLES:
-        for x in range(rect.x, rect.x + rect.width):
-            for y in range(rect.y, rect.y + rect.height):
-                inch = (x, y)
-                if inch in claimed:
-                    claimed[inch] = 'BAD'  # it's disputed... no ID may own it.
-                else:
-                    claimed[inch] = rect.name  # staking a claim
+        for inch in rect_iter(rect):
+            if inch in claimed:
+                claimed[inch] = 'BAD'  # it's disputed... no ID may own it.
+            else:
+                claimed[inch] = rect.name  # staking a claim
 
     for rect in RECTANGLES:
         perfect = True
-        for x in range(rect.x, rect.x + rect.width):
-            for y in range(rect.y, rect.y + rect.height):
-                inch = (x, y)
-                if claimed[inch] != rect.name:  # every inch needs to be named for this section
-                    perfect = False
-                    break
-
-            if not perfect:
+        for inch in rect_iter(rect):
+            if claimed[inch] != rect.name:  # every inch needs to be named for this section
+                perfect = False
                 break
 
         if perfect:  # exactly one...
