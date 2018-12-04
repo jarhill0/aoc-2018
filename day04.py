@@ -6,23 +6,25 @@ from aoc_input import AOCInput
 TEXT = AOCInput(4).value.split('\n')
 TEXT.sort()  # since each line is in YYYY-MM-DD HH:MM, it is easy to sort by string ordering
 
-ROWS = [[*map(int, re.findall(r'\d+', l))] for l in TEXT if l]  # parse out all the ints
+# parse out the relevant ints
+# this splits each line on the time colon since we only care about the minute and the guard ID.
+ROWS = [['falls' in l, 'wakes' in l, *map(int, re.findall(r'\d+', l.partition(':')[2]))] for l in TEXT if l]
 
 
 def part_a():
     guards = defaultdict(lambda: defaultdict(int))
 
-    for text_line, number_line in zip(TEXT, ROWS):
-        minute = number_line[4]
-        name = number_line[5] if len(number_line) == 6 else None  # len 6 when ID in the line
+    for line in ROWS:
+        fell_asleep, woke_up, minute = line[:3]
+        name = line[3] if len(line) == 4 else None  # len 4 when ID in the line
 
         if name is not None:
             current_guard = name
 
-        if 'falls' in text_line:
+        if fell_asleep:
             time_fell = minute
 
-        if 'wakes' in text_line:
+        if woke_up:
             for minute in range(time_fell, minute):
                 guards[current_guard][minute] += 1
 
@@ -34,17 +36,17 @@ def part_a():
 def part_b():
     guards = defaultdict(lambda: defaultdict(int))
 
-    for text_line, number_line in zip(TEXT, ROWS):
-        minute = number_line[4]
-        name = number_line[5] if len(number_line) == 6 else None  # len 6 when ID in the line
+    for line in ROWS:
+        fell_asleep, woke_up, minute = line[:3]
+        name = line[3] if len(line) == 4 else None  # len 4 when ID in the line
 
         if name is not None:
             current_guard = name
 
-        if 'falls' in text_line:
+        if fell_asleep:
             time_fell = minute
 
-        if 'wakes' in text_line:
+        if woke_up:
             for minute in range(time_fell, minute):
                 guards[current_guard][minute] += 1
 
