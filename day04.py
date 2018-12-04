@@ -3,100 +3,54 @@ from collections import defaultdict
 
 from aoc_input import AOCInput
 
-INP = AOCInput(4)
+TEXT = AOCInput(4).value.split('\n')
+TEXT.sort()  # since each line is in YYYY-MM-DD HH:MM, it is easy to sort by string ordering
 
-TEXT = INP.value.split('\n')
-TEXT.sort()
-
-ROWS = [[*map(int, re.findall(r'\d+', l))] for l in TEXT if l]
+ROWS = [[*map(int, re.findall(r'\d+', l))] for l in TEXT if l]  # parse out all the ints
 
 
 def part_a():
-    sleeps = dict()
-    guard = 0
-    time_fell = -1
-    for i, line in enumerate(ROWS):
-        name = None
-        if len(line) == 5:
-            year, month, day, hour, minute = line
-        else:
-            year, month, day, hour, minute, name = line
+    guards = defaultdict(lambda: defaultdict(int))
+
+    for text_line, number_line in zip(TEXT, ROWS):
+        minute = number_line[4]
+        name = number_line[5] if len(number_line) == 6 else None  # len 6 when ID in the line
 
         if name is not None:
-            guard = name
+            current_guard = name
 
-        if 'falls' in TEXT[i]:
+        if 'falls' in text_line:
             time_fell = minute
 
-        if 'wakes' in TEXT[i]:
-            time_sleep = sleeps.get(guard, 0)
-            sleeps[guard] = time_sleep + (minute - time_fell)
+        if 'wakes' in text_line:
+            for minute in range(time_fell, minute):
+                guards[current_guard][minute] += 1
 
-    best = 0
-    guardbest = ''
-    for guard in sleeps:
-        if sleeps[guard] > best:
-            best = sleeps[guard]
-            guardbest = guard
-
-    asleep = dict()
-    for i, line in enumerate(ROWS):
-        name = None
-        if len(line) == 5:
-            year, month, day, hour, minute = line
-        else:
-            year, month, day, hour, minute, name = line
-
-        if name is not None:
-            guard = name
-
-        if guard == guardbest:
-            if 'falls' in TEXT[i]:
-                time_fell = minute
-
-            if 'wakes' in TEXT[i]:
-                for t in range(time_fell, minute):
-                    v = asleep.get(t, 0)
-                    asleep[t] = v + 1
-
-    return max(asleep, key=lambda m: asleep[m]) * guardbest
+    sleepiest_guard = max(guards.keys(), key=lambda g: sum(guards[g].values()))
+    sleepiest_minute = max(guards[sleepiest_guard].keys(), key=lambda min: guards[sleepiest_guard][min])
+    return sleepiest_guard * sleepiest_minute
 
 
 def part_b():
-    guards = defaultdict(dict)
-    guard = 0
-    time_fell = -1
-    for i, line in enumerate(ROWS):
-        name = None
-        if len(line) == 5:
-            year, month, day, hour, minute = line
-        else:
-            year, month, day, hour, minute, name = line
+    guards = defaultdict(lambda: defaultdict(int))
+
+    for text_line, number_line in zip(TEXT, ROWS):
+        minute = number_line[4]
+        name = number_line[5] if len(number_line) == 6 else None  # len 6 when ID in the line
 
         if name is not None:
-            guard = name
+            current_guard = name
 
-        if 'falls' in TEXT[i]:
+        if 'falls' in text_line:
             time_fell = minute
 
-        if 'wakes' in TEXT[i]:
-            for t in range(time_fell, minute):
-                gdict = guards[guard]
-                gdict[t] = gdict.get(t, 0) + 1
+        if 'wakes' in text_line:
+            for minute in range(time_fell, minute):
+                guards[current_guard][minute] += 1
 
-    bestguard = ''
-    most_asleep = 0
-    bmin = None
-    for guard in guards:
-        gdict = guards[guard]
-        for min in gdict:
-            asleep = gdict[min]
-            if asleep > most_asleep:
-                most_asleep = asleep
-                bmin = min
-                bestguard = guard
-
-    return bestguard * bmin
+    sleepiest_minute = {guard: max(guards[guard].keys(), key=lambda m: guards[guard][m]) for guard in guards.keys()}
+    sleepiest_guard = max(guards.keys(), key=lambda g: guards[g][sleepiest_minute[g]])
+    return sleepiest_guard * sleepiest_minute[sleepiest_guard]
 
 
 if __name__ == '__main__':
