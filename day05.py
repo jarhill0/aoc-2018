@@ -12,18 +12,15 @@ def part_a():
 
 
 def react(polymer):
-    p = list(polymer)
+    stack = []
 
-    i = 0
-    while i + 1 < len(p):
-        if opp_polarity(p[i], p[i + 1]):
-            del p[i]
-            del p[i]  # p[i + 1], but shifted left now!
-            if i >= 1:
-                i -= 1  # we might have created a new collision, so backtrack.
-        else:  # don't increment when we've just deleted.
-            i += 1
-    return p
+    for c in polymer:
+        if len(stack) > 0 and opp_polarity(stack[-1], c):
+            stack.pop()  # remove the last element because it reacts with element c
+        else:
+            stack.append(c)
+
+    return stack
 
 
 def part_b():
