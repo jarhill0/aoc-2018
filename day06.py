@@ -12,32 +12,35 @@ def manhattan_dist(p1, p2):
 
 
 def part_a():
-    dists = defaultdict(dict)
-    claimed = defaultdict(list)
+    maxx = max(p[0] for p in POINTS)
+    minx = min(p[0] for p in POINTS)
+    maxy = max(p[1] for p in POINTS)
+    miny = min(p[1] for p in POINTS)
 
-    for point in POINTS:
-        dist = dists[point]
-        dist[point] = 0
-        stack = [point]
-        infinite = False
+    claimed = defaultdict(int)
+    infinite = defaultdict(bool)
 
-        while len(stack) > 0:
-            x, y = stack.pop()
-            if any(manhattan_dist(p_other, (x, y)) <= dist[x, y] if p_other != point else False for p_other in POINTS):
-                continue
-            claimed[point].append((x, y))
-            if dist[x, y] > 300:  # infinite
-                infinite = True
-                break
-            for adj in (x + 1, y), (x, y + 1), (x - 1, y), (x, y - 1):
-                if adj not in dist:
-                    dist[adj] = dist[x, y] + 1
-                    stack.append(adj)
+    for x in range(minx, maxx + 1):
+        for y in range(miny, maxy + 1):
+            best_dist = 10 ** 999
+            to_point = None
+            dup = False
 
-        if infinite:
-            claimed[point] = []
+            for point in POINTS:
+                d = manhattan_dist(point, (x, y))
+                if d == best_dist:
+                    dup = True
+                elif d < best_dist:
+                    best_dist = d
+                    to_point = point
+                    dup = False
 
-    return max(len(claimed[p]) for p in POINTS)
+            if not dup:
+                claimed[to_point] += 1
+            if x in (minx, maxx) or y in (miny, maxy):  # anything that has points on the edge has infinite points
+                infinite[to_point] = True
+
+    return max(claimed[p] for p in POINTS if not infinite[p])
 
 
 def part_b():
