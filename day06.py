@@ -1,5 +1,5 @@
 import re
-from collections import defaultdict
+from collections import Counter, defaultdict
 
 from aoc_input import AOCInput
 
@@ -22,20 +22,10 @@ def part_a():
 
     for x in range(minx, maxx + 1):
         for y in range(miny, maxy + 1):
-            best_dist = 10 ** 999
-            to_point = None
-            dup = False
+            distances = {point: manhattan_dist(point, (x, y)) for point in POINTS}
+            to_point = min(distances.keys(), key=distances.get)
 
-            for point in POINTS:
-                d = manhattan_dist(point, (x, y))
-                if d == best_dist:
-                    dup = True
-                elif d < best_dist:
-                    best_dist = d
-                    to_point = point
-                    dup = False
-
-            if not dup:
+            if Counter(distances.values())[distances[to_point]] == 1:  # if the minimum is UNIQUE
                 claimed[to_point] += 1
             if x in (minx, maxx) or y in (miny, maxy):  # anything that has points on the edge has infinite points
                 infinite[to_point] = True
