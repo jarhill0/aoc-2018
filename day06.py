@@ -44,7 +44,15 @@ def part_a():
 
 
 def part_b():
-    pass
+    maxx = max(p[0] for p in POINTS)
+    minx = min(p[0] for p in POINTS)
+    maxy = max(p[1] for p in POINTS)
+    miny = min(p[1] for p in POINTS)
+
+    return sum(1
+               for x in range(minx, maxx + 1)
+               for y in range(miny, maxy + 1)
+               if sum(manhattan_dist(point, (x, y)) for point in POINTS) < 10000)
 
 
 if __name__ == '__main__':
