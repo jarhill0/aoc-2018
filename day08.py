@@ -27,14 +27,10 @@ def part_b():
 
 class Node:
     def __init__(self, vals):
-        self.children = []
-
         n_children = vals.popleft()
         n_metadata = vals.popleft()
 
-        for _ in range(n_children):
-            self.children.append(Node(vals))
-
+        self.children = [Node(vals) for _ in range(n_children)]
         self.metadata = [vals.popleft() for _ in range(n_metadata)]
 
     def value(self):
