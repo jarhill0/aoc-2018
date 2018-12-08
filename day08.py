@@ -20,5 +20,30 @@ def sum_metadata(vals):
     return metadata_sum
 
 
+def part_b():
+    vals = deque([int(n) for n in INP.value.split()])
+    return Node(vals).value()
+
+
+class Node:
+    def __init__(self, vals):
+        self.children = []
+
+        n_children = vals.popleft()
+        n_metadata = vals.popleft()
+
+        for _ in range(n_children):
+            self.children.append(Node(vals))
+
+        self.metadata = [vals.popleft() for _ in range(n_metadata)]
+
+    def value(self):
+        if len(self.children) == 0:
+            return sum(self.metadata)
+
+        return sum(self.children[m - 1].value() for m in self.metadata if m <= len(self.children))
+
+
 if __name__ == '__main__':
     print(part_a())
+    print(part_b())
