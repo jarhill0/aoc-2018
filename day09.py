@@ -3,44 +3,19 @@ from collections import defaultdict
 from aoc_input import AOCInput
 
 INP = AOCInput(9)
-MARBLES = 71144
-PLAYERS = 424
-
-# MARBLES = 1618
-# PLAYERS = 10
-
-
+MARBLES = int(INP.value.split()[6])
+PLAYERS = int(INP.value.split()[0])
 
 
 def part_a():
-    circle = [0]
-    current = 0
-    player = 0
-    score = defaultdict(int)
-    for marble in range(1, MARBLES + 1):
-        # print(circle)
-        if marble % 23 == 0:
-            score[player] += marble
-            other_ind = (circle.index(current) - 7) % len(circle)
-            score[player] += circle[other_ind]
-            del circle[other_ind]
-            current = circle[other_ind % len(circle)]
-        else:
-            if len(circle) == 1:
-                two_right = 1
-            else:
-                two_right = (circle.index(current) + 2) % len(circle)
-                if two_right == 0:
-                    two_right = len(circle)
-            circle.insert(two_right, marble)
-            current = marble
-
-        player = (player + 1) % PLAYERS
-
-    return max(score.values())
+    return solve(MARBLES)
 
 
-class Marble:  # linked list thing... Cheap inserts, deletes
+# The Marble class is really a circular linked list. It gives us O(1) inserts
+# and O(1) removes, which is something that Python's list, which is implemented
+# using arrays, doesn't give us (instead, inserts and removes are both O(n)).
+# This problem is minor for part A but huge for part B.
+class Marble:
     def __init__(self, num, left=None, right=None):
         self.num = num
         self.left = left
@@ -58,19 +33,17 @@ class Marble:  # linked list thing... Cheap inserts, deletes
         self.left.right = self.right
 
 
-def part_b():
+# Note: this algorithm isn't as fast as I'd like (part B takes several seconds). I feel like there
+# must be some underlying pattern which I haven't noticed which eliminates the need for a list of any kind.
+def solve(max_marble):
     current = Marble(0)
-    current.left = current
-    current.right = current
+    current.left = current  # make it
+    current.right = current  # a loop!
 
     player = 0
     score = defaultdict(int)
-    for marble in range(1, 100 * MARBLES + 1):
-        # print(circle)
+    for marble in range(1, max_marble + 1):
         if marble % 23 == 0:
-            # if marble % 1000 == 0:
-            #     print('{}/{}'.format(marble, MARBLES))
-
             score[player] += marble
             for _ in range(7):
                 current = current.left
@@ -84,6 +57,10 @@ def part_b():
         player = (player + 1) % PLAYERS
 
     return max(score.values())
+
+
+def part_b():
+    return solve(100 * MARBLES)
 
 
 if __name__ == '__main__':
