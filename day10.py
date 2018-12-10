@@ -21,24 +21,14 @@ class Point:
         return str([self.x, self.y, self.velx, self.vely])
 
 
-def part_a():
+def solve():
     points = set()
     for line in INP.value.split('\n'):
         x, y, velx, vely = (int(x) for x in re.findall(r'-?\d+', line))
         points.add(Point(x, y, velx, vely))
 
-    # pick two random points, say we want them within a certain threshold of each other
-    left = min(points, key=lambda p: p.x)
-    right = max(points, key=lambda p: p.x)
-
-    # diff = (m_1 * x + b_1) - (m_2 * x + b_2)
-    #      = x * (m_1 - m_2) + b_1 - b_2
-    # diff + b_2 - b_1 = x * (m_1 - m_2)
-    # (diff + b_2 - b_1) / (m_1 - m_2) = x
-    big_step = (500 + left.x - right.x) // (right.velx - left.velx)
-
-    for p in points:
-        p.step(big_step)
+    best = 10 ** 999
+    i = 0
     while True:
         maxx = max(p.x for p in points)
         minx = min(p.x for p in points)
@@ -54,15 +44,16 @@ def part_a():
                 print()  # newline
 
             sleep(1)
+            print(i)
 
+        if maxx - minx < best:
+            best = maxx - minx
+        else:
+            break
         for p in points:
             p.step()
-
-
-def part_b():
-    pass
+        i += 1
 
 
 if __name__ == '__main__':
-    print(part_a())
-    print(part_b())
+    solve()
