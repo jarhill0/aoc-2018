@@ -35,8 +35,7 @@ def step(row, zero_index):
         if i < 2 or i >= len(row) - 2:  # boundary conditions
             out.append(row[i])
         else:
-            plant = STATES.get(tuple(row[i - 2: i + 3]), False)
-            out.append(plant)
+            out.append(STATES[tuple(row[i - 2: i + 3])])
 
     return out, zero_index
 
