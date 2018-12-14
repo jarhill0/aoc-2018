@@ -1,4 +1,5 @@
 from aoc_input import AOCInput
+from linked_list import LinkedList
 
 INP = AOCInput(12)
 
@@ -41,12 +42,33 @@ def step(row, zero_index):
 
 
 def part_a():
-    pots = INIT
+    pots = list(INIT)
     zero = 0
     for _ in range(20):
         pots, zero = step(pots, zero)
     return sum((i - zero) * plant for i, plant in enumerate(pots))  # True = 1; False = 0
 
 
+def part_b():
+    plants = {i for i, pot in enumerate(INIT) if pot}
+    worklist = LinkedList()
+
+    for _ in range(50000000000):
+        new_plants = set()
+        worklist.clear()
+        for i in range(min(plants) - 5, max(plants) + 8):
+            worklist.append(i in plants)
+            if len(worklist) < 5:
+                continue
+            while len(worklist) > 5:
+                del worklist[0]
+
+            if STATES[tuple(worklist)]:
+                new_plants.add(i - 2)
+        plants = new_plants
+    return sum(plants)
+
+
 if __name__ == '__main__':
     print(part_a())
+    print(part_b())
