@@ -6,6 +6,12 @@ import requests
 class AOCInput:
     url = 'https://adventofcode.com/{year}/day/{day}/input'
 
+    @classmethod
+    def test_input(cls, val):
+        inp = cls(-1)
+        inp._value = val
+        return inp
+
     def __init__(self, day, year='2018'):
         self.year = year
         self.day = day
@@ -13,7 +19,7 @@ class AOCInput:
         self._session_cookie = None
 
     def _filename(self):
-        return path.join('inputs', '{} {}.aocinput'.format(self.year, self.day))
+        return path.join(path.dirname(__file__), 'inputs', '{} {}.aocinput'.format(self.year, self.day))
 
     @property
     def _session(self):

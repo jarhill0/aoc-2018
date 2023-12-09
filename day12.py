@@ -1,74 +1,56 @@
+from collections import defaultdict
+
 from aoc_input import AOCInput
-from linked_list import LinkedList
-
-INP = AOCInput(12)
-
-INIT = [c == '#' for c in INP.value.split('\n')[0].partition(': ')[2]]
-STATES = dict()
-
-for line in INP.value.split('\n'):
-    if ' => ' in line:
-        start, _, end = line.partition(' => ')
-        assert len(start) == 5
-        assert len(end) == 1
-
-        start = tuple(c == '#' for c in start)
-        end = end == '#'
-        STATES[start] = end
-
-assert len(STATES) == 2 ** 5
-# note: this code assumes ..... => . is always true. Otherwise the problem is way harder.
-assert not STATES[(False, False, False, False, False)]
 
 
-def step(row, zero_index):
-    if len(row) < 5:
-        return row, zero_index
+def parse(inp):
+    lines = inp.value.splitlines()
+    _, _, initial = lines[0].partition(": ")
+    init = defaultdict(bool)
+    for i, state in enumerate(initial):
+        if state == "#":
+            init[i] = True
 
-    while any(row[:5]):  # those should all be false
-        row.insert(0, False)
-        zero_index += 1  # what we think of as "zero" has shifted
-    while any(row[-5:]):  # those should also all be false
-        row.append(False)
+    rules = {}
+    for r in lines[2:]:
+        start, _, result = r.partition(" => ")
+        st = tuple(c == "#" for c in start)
+        rules[st] = result == "#"
 
-    out = []
-    for i in range(len(row)):
-        if i < 2 or i >= len(row) - 2:  # boundary conditions
-            out.append(row[i])
-        else:
-            out.append(STATES[tuple(row[i - 2: i + 3])])
-
-    return out, zero_index
+    return init, PlantRules(rules)
 
 
-def part_a():
-    pots = list(INIT)
-    zero = 0
+class PlantRules:
+    def __init__(self, rules):
+        self.rules = rules
+
+    def next_generation(self, in_plants):
+        next_plants = defaultdict(bool)
+        for p in range(min(in_plants) - 2, max(in_plants) + 3):
+            next_plants[p] = self.plant_at(p, in_plants)
+        return next_plants
+
+    def plant_at(self, p, plants):
+        key = tuple(plants[i] for i in range(p - 2, p + 3))
+        return self.rules.get(key, False)
+
+
+def part_a(inp):
+    plants, rules = parse(inp)
     for _ in range(20):
-        pots, zero = step(pots, zero)
-    return sum((i - zero) * plant for i, plant in enumerate(pots))  # True = 1; False = 0
+        plants = rules.next_generation(plants)
+    return plant_score(plants)
 
 
-def part_b():
-    plants = {i for i, pot in enumerate(INIT) if pot}
-    worklist = LinkedList()
-
-    for _ in range(50000000000):
-        new_plants = set()
-        worklist.clear()
-        for i in range(min(plants) - 5, max(plants) + 8):
-            worklist.append(i in plants)
-            if len(worklist) < 5:
-                continue
-            while len(worklist) > 5:
-                del worklist[0]
-
-            if STATES[tuple(worklist)]:
-                new_plants.add(i - 2)
-        plants = new_plants
-    return sum(plants)
+def plant_score(plants):
+    return sum(num for num, p in plants.items() if p)
 
 
-if __name__ == '__main__':
-    print(part_a())
-    print(part_b())
+def part_b(inp):
+    pass
+
+
+if __name__ == "__main__":
+    INP = AOCInput(12)
+    print(part_a(INP))
+    print(part_b(INP))
