@@ -198,11 +198,13 @@ def part_b(inp):
         combat.round()
     return combat.outcome()
 
+
 def elves_win_unscathed(inp, elf_power):
     combat = parse(inp, elf_power)
     while not combat.game_over and not combat.elf_died:
         combat.round()
     return not combat.elf_died
+
 
 if __name__ == "__main__":
     INP = AOCInput(15)
