@@ -24,6 +24,7 @@ class Combat:
         self.board = board
         self.rounds_completed = 0
         self.game_over = False
+        self.elf_died = False
 
     def __str__(self):
         max_r = max(r for r, c in self.board)
@@ -156,6 +157,8 @@ class Combat:
         new_health = target_health - my_attack_power
         if new_health <= 0:
             del self.board[chosen_target]
+            if target_kind == ELF:
+                self.elf_died = True
         else:
             self.board[chosen_target] = (target_kind, target_attack_power, new_health)
 
@@ -166,7 +169,7 @@ class Combat:
         return sum(hit_points for _, _, hit_points in self.board.values())
 
 
-def parse(inp):
+def parse(inp, elf_power=3):
     board = {}
     for r, row in enumerate(inp.value.splitlines()):
         for c, char in enumerate(row):
@@ -175,7 +178,7 @@ def parse(inp):
             elif char == "G":
                 board[(r, c)] = (GOBLIN, 3, 200)
             elif char == "E":
-                board[(r, c)] = (ELF, 3, 200)
+                board[(r, c)] = (ELF, elf_power, 200)
     return Combat(board)
 
 
@@ -187,8 +190,19 @@ def part_a(inp):
 
 
 def part_b(inp):
-    return None
+    elf_power = 3
+    while not elves_win_unscathed(inp, elf_power):
+        elf_power += 1
+    combat = parse(inp, elf_power)
+    while not combat.game_over:
+        combat.round()
+    return combat.outcome()
 
+def elves_win_unscathed(inp, elf_power):
+    combat = parse(inp, elf_power)
+    while not combat.game_over and not combat.elf_died:
+        combat.round()
+    return not combat.elf_died
 
 if __name__ == "__main__":
     INP = AOCInput(15)
