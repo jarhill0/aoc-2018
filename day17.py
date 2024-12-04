@@ -1,3 +1,5 @@
+import sys
+
 from aoc_input import AOCInput
 
 CLAY = 1
@@ -14,10 +16,12 @@ class Ground:
         self.water_source = (500, 0)
 
     def simulate(self):
+        old_limit = sys.getrecursionlimit()
+        sys.setrecursionlimit(2000)
         try:
             self.fill(self.water_source)
-        except RecursionError:
-            self.visualize()
+        finally:
+            sys.setrecursionlimit(old_limit)
 
     def fill(self, pt):
         if pt[1] > self.max_y or pt in self.grid:
@@ -114,10 +118,6 @@ def part_b(inp):
 
 
 if __name__ == "__main__":
-    import sys
-
-    sys.setrecursionlimit(2000)
-
     INP = AOCInput(17)
     print(part_a(INP))
     print(part_b(INP))
