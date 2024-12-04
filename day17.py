@@ -108,7 +108,9 @@ def part_a(inp):
 
 
 def part_b(inp):
-    return None
+    g = parse(inp)
+    g.simulate()
+    return sum(s == WATER for s in g.grid.values())
 
 
 if __name__ == "__main__":
