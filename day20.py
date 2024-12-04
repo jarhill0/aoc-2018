@@ -42,23 +42,26 @@ class Map:
         return ri, current
 
     def furthest_room(self):
-        reached = set()
+        return max(self.distances().values())
+
+    def distances(self):
+        dists = dict()
         steps = 0
         curr = {self.origin}
 
         while curr:
             next_rooms = set()
             for room in curr:
-                reached.add(room.loc)
+                dists[room.loc] = steps
 
                 for nr in room.neighbors():
-                    if nr.loc not in reached:
+                    if nr.loc not in dists:
                         next_rooms.add(nr)
 
             curr = next_rooms
             steps += 1
 
-        return steps - 1
+        return dists
 
     def visualize(self):
         out = ""
@@ -156,7 +159,9 @@ def part_a(inp):
 
 
 def part_b(inp):
-    pass
+    m = Map(inp.value[1:-1])
+    m.explore()
+    return sum(d >= 1000 for d in m.distances().values())
 
 
 if __name__ == "__main__":
