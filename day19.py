@@ -1,5 +1,3 @@
-import collections
-
 from aoc_input import AOCInput
 
 from day16 import (
@@ -61,10 +59,6 @@ def part_a(inp):
     return registers[0]
 
 
-def part_b(inp):
-    pass
-
-
 def execute(prog, ip_reg):
     registers = [0] * 6
     while 0 <= registers[ip_reg] < len(prog):
@@ -74,7 +68,29 @@ def execute(prog, ip_reg):
     return registers
 
 
+def part_b():  # manually translated from my input (fun! decompilation!)
+    # Setup
+    huge = (2 * 2) * 19 * 11 + 2 * 22 + 2 + (27 * 28 + 29) * 30 * 14 * 32  # inst 17–33
+    result = 0  # inst 34
+
+    # Loop setup
+    huge_loops_completed = 1  # inst 1
+    while True:
+        i = 1  # inst 2
+        while True:
+            if huge_loops_completed * i == huge:  # jeq (inst 3–5)
+                result += huge_loops_completed  # inst 7
+            i += 1  # inst 8
+            if i > huge:  # jgt (inst 9–10)
+                huge_loops_completed += 1  # inst 12
+                if huge_loops_completed > huge:  # jgt (inst 13–14)
+                    return result  # inst 16
+                else:
+                    break  # jmp inst 2 (inst 15)
+            # loop end (inst 11)
+
+
 if __name__ == "__main__":
     INP = AOCInput(19)
     print(part_a(INP))
-    print(part_b(INP))
+    print(part_b())
