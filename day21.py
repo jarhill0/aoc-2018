@@ -17,19 +17,18 @@ def program():  # my input
         four = three | 0x10000  # line 6
         three = 1107552  # line 7
         while True:
-            five = four & 0xFF  # line 8
-            three += five  # line 9
-            three &= 16777215  # line 10
+            three += four & 0xFF
+            three &= 0xFFFFFF  # line 10
             three *= 65899  # line 11
-            three &= 16777215  # line 12
+            three &= 0xFFFFFF  # line 12
 
             if 256 > four:  # line 13–14
                 break
 
-            five = 0  # line 17
-            while not (256 * (five + 1) > four):
-                five += 1  # (line 24)
-            four = five  # line 26
+            j = 0  # line 17
+            while not (256 * (j + 1) > four):
+                j += 1  # (line 24)
+            four = j  # line 26
             # goto 8
 
         if three != zero:  # "do-while"
