@@ -2,14 +2,21 @@ from aoc_input import AOCInput
 
 
 def part_a(inp):
-    return program()
+    return next(program())
 
 
 def part_b(inp):
-    pass
+    prev = None
+    seen = set()
+    for val_attained in program():
+        if val_attained in seen:
+            return prev
+
+        seen.add(val_attained)
+        prev = val_attained
 
 
-# Run the program and then return the first value that reg[3] attains at the equality check
+# Run the program and then return values that reg[3] attains at the equality check
 def program():  # my input
     three = 0  # line 5
     while True:
@@ -28,7 +35,7 @@ def program():  # my input
 
             # goto 8
 
-        return three
+        yield three
         # if three == zero:  # "do-while"
         #     return
         # goto 6
