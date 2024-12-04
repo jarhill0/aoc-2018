@@ -64,8 +64,32 @@ def part_a(inp):
     return resource_value(board)
 
 
+def freeze(board, rows, cols):
+    out = ""
+    for r in range(rows):
+        for c in range(cols):
+            out += {OPEN: ".", TREES: "|", LUMBERYARD: "#"}[board[(r, c)]]
+        out += "\n"
+    return out
+
+
 def part_b(inp):
-    pass
+    rows = len(inp.value.splitlines())
+    cols = len(inp.value.splitlines()[0])
+
+    board = parse(inp.value)
+    seen = dict()
+    remaining = 0
+    for i in range(1000000000):
+        board = generation(board, rows, cols)
+        if freeze(board, rows, cols) in seen:
+            cycle_length = i - seen[freeze(board, rows, cols)]
+            remaining = (1000000000 - i - 1) % cycle_length
+            break
+        seen[freeze(board, rows, cols)] = i
+    for i in range(remaining):
+        board = generation(board, rows, cols)
+    return resource_value(board)
 
 
 if __name__ == "__main__":
