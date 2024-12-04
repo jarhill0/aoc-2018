@@ -71,14 +71,8 @@ def execute(prog, ip_reg):
 def part_b():  # manually translated from my input (fun! decompilation!)
     # Setup
     huge = (2 * 2) * 19 * 11 + 2 * 22 + 2 + (27 * 28 + 29) * 30 * 14 * 32  # inst 17–33
-    result = 0  # inst 34
 
-    for j in range(huge):  # inst 1, 12, 13–14
-        for i in range(1, huge + 1):  # inst 2, 8, 9–10, 15
-            if j * i == huge:  # jeq (inst 3–5)
-                result += j  # inst 7
-
-    return result
+    return sum(j if huge % j == 0 else 0 for j in range(1, huge + 1))
 
 
 if __name__ == "__main__":
