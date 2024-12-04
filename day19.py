@@ -73,16 +73,12 @@ def part_b():  # manually translated from my input (fun! decompilation!)
     huge = (2 * 2) * 19 * 11 + 2 * 22 + 2 + (27 * 28 + 29) * 30 * 14 * 32  # inst 17–33
     result = 0  # inst 34
 
-    # Loop setup
-    huge_loops_completed = 1  # inst 1
-    while True:
+    for j in range(huge):  # inst 1, 12, 13–14
         for i in range(1, huge + 1):  # inst 2, 8, 9–10, 15
-            if huge_loops_completed * i == huge:  # jeq (inst 3–5)
-                result += huge_loops_completed  # inst 7
+            if j * i == huge:  # jeq (inst 3–5)
+                result += j  # inst 7
 
-        huge_loops_completed += 1  # inst 12
-        if huge_loops_completed > huge:  # jgt (inst 13–14)
-            return result  # inst 16
+    return result
 
 
 if __name__ == "__main__":
