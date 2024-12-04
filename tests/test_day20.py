@@ -14,7 +14,7 @@ EXAMPLE5 = AOCInput.test_input(
 )
 
 
-class TestDay18(unittest.TestCase):
+class TestDay20(unittest.TestCase):
     def test_part_a(self):
         self.assertEqual(3, day20.part_a(EXAMPLE1))
         self.assertEqual(10, day20.part_a(EXAMPLE2))
