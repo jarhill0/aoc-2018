@@ -76,18 +76,13 @@ def part_b():  # manually translated from my input (fun! decompilation!)
     # Loop setup
     huge_loops_completed = 1  # inst 1
     while True:
-        i = 1  # inst 2
-        while True:
+        for i in range(1, huge + 1):  # inst 2, 8, 9–10, 15
             if huge_loops_completed * i == huge:  # jeq (inst 3–5)
                 result += huge_loops_completed  # inst 7
-            i += 1  # inst 8
-            if i > huge:  # jgt (inst 9–10)
-                huge_loops_completed += 1  # inst 12
-                if huge_loops_completed > huge:  # jgt (inst 13–14)
-                    return result  # inst 16
-                else:
-                    break  # jmp inst 2 (inst 15)
-            # loop end (inst 11)
+
+        huge_loops_completed += 1  # inst 12
+        if huge_loops_completed > huge:  # jgt (inst 13–14)
+            return result  # inst 16
 
 
 if __name__ == "__main__":
