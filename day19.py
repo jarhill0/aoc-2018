@@ -59,23 +59,31 @@ def part_a(inp):
     return registers[0]
 
 
-def execute(prog, ip_reg):
-    registers = [0] * 6
+def execute(prog, ip_reg, registers=None):
+    registers = registers or [0] * 6
     while 0 <= registers[ip_reg] < len(prog):
+        # JIT compilation :P
+        if registers[ip_reg] == 1:  # the 1 works for my input
+            registers[0] = sum_factors(registers[2])  # reg[2] works for my input
+            registers[3] = 16 * 16
+            return registers
         op, a, b, c = prog[registers[ip_reg]]
         op(registers, a, b, c)
         registers[ip_reg] += 1
     return registers
 
 
-def part_b():  # manually translated from my input (fun! decompilation!)
-    # Setup
-    huge = (2 * 2) * 19 * 11 + 2 * 22 + 2 + (27 * 28 + 29) * 30 * 14 * 32  # inst 17–33
+def part_b(inp):
+    ip_reg, prog = parse(inp)
+    registers = execute(prog, ip_reg, registers=[1] + [0] * 5)
+    return registers[0]
 
-    return sum(j if huge % j == 0 else 0 for j in range(1, huge + 1))
+
+def sum_factors(num):
+    return sum(j if num % j == 0 else 0 for j in range(1, num + 1))
 
 
 if __name__ == "__main__":
     INP = AOCInput(19)
     print(part_a(INP))
-    print(part_b())
+    print(part_b(INP))

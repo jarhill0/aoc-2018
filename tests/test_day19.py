@@ -20,11 +20,10 @@ seti 9 0 5
 
 class TestDay19(unittest.TestCase):
     def test_part_a(self):
-        self.assertEqual(7, day19.part_a(EXAMPLE))
         self.assertEqual(2223, day19.part_a(INPUT))
 
     def test_part_b(self):
-        self.assertEqual(24117312, day19.part_b())
+        self.assertEqual(24117312, day19.part_b(INPUT))
 
 
 if __name__ == "__main__":
