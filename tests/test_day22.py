@@ -14,8 +14,10 @@ class TestDay22(unittest.TestCase):
         self.assertEqual(6318, day22.part_a(INPUT))
 
     def test_part_b(self):
-        self.assertEqual(None, day22.part_b(EXAMPLE))
-        self.assertEqual(None, day22.part_b(INPUT))
+        self.assertEqual(45, day22.part_b(EXAMPLE))
+        actual = day22.part_b(INPUT)
+        self.assertLess(actual, 1099)
+        # self.assertEqual(None, day22.part_b(INPUT))
 
 
 if __name__ == "__main__":

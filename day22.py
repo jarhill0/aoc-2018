@@ -9,39 +9,99 @@ def parse(inp):
     return d, t
 
 
+ROCKY = 0
+WET = 1
+NARROW = 2
+
 MODULO = 20183
 
 
-def erosion_levels(depth, target):
-    el = {(0, 0): depth % MODULO}
+class Map:
+    def __init__(self, depth, target):
+        self.depth = depth
+        self.target = target
+        self.el = {(0, 0): depth % MODULO}
+        self.region_kind(target)  # init for part 1
+        self.el[target] = depth % MODULO
 
-    def el_inner(at):
-        if at not in el:
+    def region_kind(self, at):
+        return self.erosion_level(at) % 3
+
+    def erosion_level(self, at):
+        if at not in self.el:
             x, y = at
             if y == 0:
                 geologic_index = 16807 * x
             elif x == 0:
                 geologic_index = 48271 * y
             else:
-                geologic_index = el_inner((x - 1, y)) * el_inner((x, y - 1))
-            el[at] = (geologic_index + depth) % MODULO
+                geologic_index = self.erosion_level((x - 1, y)) * self.erosion_level(
+                    (x, y - 1)
+                )
+            self.el[at] = (geologic_index + self.depth) % MODULO
 
-        return el[at]
-
-    el_inner(target)  # memoize it up
-
-    el[target] = depth % MODULO
-
-    return el
+        return self.el[at]
 
 
 def part_a(inp):
-    grid = erosion_levels(*parse(inp))
-    return sum(v % 3 for v in grid.values())
+    grid = Map(*parse(inp))
+    return sum(v % 3 for v in grid.el.values())
 
 
 def part_b(inp):
-    pass
+    depth, target = parse(inp)
+    maze = Map(depth, target)
+    return fastest_route(maze, target)
+
+
+TORCH = 101
+GEAR = 102
+NEITHER = 100
+
+ALLOWED = {ROCKY: {TORCH, GEAR}, WET: {GEAR, NEITHER}, NARROW: {TORCH, NEITHER}}
+
+
+def fastest_route(maze, target):
+    gen = {((0, 0), TORCH): 0}
+    been = {((0, 0), TORCH)}
+    length = 0
+    while True:
+        next_gen = dict()
+        for (pt, tool), wait_remaining in gen.items():
+            if wait_remaining > 0:
+                next_gen[(pt, tool)] = wait_remaining - 1
+                continue
+
+            if pt == target:
+                if tool == TORCH:
+                    return length
+                return length + 7
+
+            pt_kind = maze.region_kind(pt)
+            for neighbor in neighbors(pt):
+                neighbor_kind = maze.region_kind(neighbor)
+                allowed_tools = ALLOWED[pt_kind].intersection(ALLOWED[neighbor_kind])
+                for next_tool in allowed_tools:
+                    if (neighbor, next_tool) in been:
+                        if (neighbor, next_tool) in next_gen and tool == next_tool:
+                            # alternate route required tool change. we're here sooner
+                            next_gen[(neighbor, next_tool)] = 0
+                        continue
+                    been.add((neighbor, next_tool))
+                    next_gen[(neighbor, next_tool)] = 0 if tool == next_tool else 7
+
+        length += 1
+        gen = next_gen
+
+
+def neighbors(pt):
+    x, y = pt
+    n = {(x + 1, y), (x, y + 1)}
+    if x > 0:
+        n.add((x - 1, y))
+    if y > 0:
+        n.add((x, y - 1))
+    return n
 
 
 if __name__ == "__main__":
