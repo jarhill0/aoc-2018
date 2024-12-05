@@ -78,17 +78,20 @@ def fastest_route(maze, target):
                 return length + 7
 
             pt_kind = maze.region_kind(pt)
+            other_tool = next(iter(ALLOWED[pt_kind].difference({tool})))
+            if (pt, other_tool) not in been:
+                next_gen[(pt, other_tool)] = (
+                    6  # this iteration counts as our first minute of wait
+                )
+                been.add((pt, other_tool))
+
             for neighbor in neighbors(pt):
                 neighbor_kind = maze.region_kind(neighbor)
-                allowed_tools = ALLOWED[pt_kind].intersection(ALLOWED[neighbor_kind])
-                for next_tool in allowed_tools:
-                    if (neighbor, next_tool) in been:
-                        if (neighbor, next_tool) in next_gen and tool == next_tool:
-                            # alternate route required tool change. we're here sooner
-                            next_gen[(neighbor, next_tool)] = 0
-                        continue
-                    been.add((neighbor, next_tool))
-                    next_gen[(neighbor, next_tool)] = 0 if tool == next_tool else 7
+                neighbor_tools = ALLOWED[neighbor_kind]
+                if tool in neighbor_tools:
+                    if (neighbor, tool) not in been:
+                        next_gen[(neighbor, tool)] = 0
+                        been.add((neighbor, tool))
 
         length += 1
         gen = next_gen

@@ -16,7 +16,7 @@ class TestDay22(unittest.TestCase):
     def test_part_b(self):
         self.assertEqual(45, day22.part_b(EXAMPLE))
         actual = day22.part_b(INPUT)
-        self.assertLess(actual, 1099)
+        self.assertLess(actual, 1095)
         # self.assertEqual(None, day22.part_b(INPUT))
 
 
