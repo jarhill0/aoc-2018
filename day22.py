@@ -21,7 +21,7 @@ class Map:
         self.depth = depth
         self.target = target
         self.el = {(0, 0): depth % MODULO}
-        self.region_kind(target)  # init for part 1
+        self.erosion_level(target)  # init for part 1
         self.el[target] = depth % MODULO
 
     def region_kind(self, at):
@@ -49,9 +49,7 @@ def part_a(inp):
 
 
 def part_b(inp):
-    depth, target = parse(inp)
-    maze = Map(depth, target)
-    return fastest_route(maze, target)
+    return fastest_route(Map(*parse(inp)))
 
 
 TORCH = 101
@@ -61,9 +59,9 @@ NEITHER = 100
 ALLOWED = {ROCKY: {TORCH, GEAR}, WET: {GEAR, NEITHER}, NARROW: {TORCH, NEITHER}}
 
 
-def fastest_route(maze, target):
+def fastest_route(maze):
     gen = {((0, 0), TORCH): 0}
-    been = {((0, 0), TORCH)}
+    been = set()
     length = 0
     while True:
         next_gen = dict()
@@ -72,18 +70,16 @@ def fastest_route(maze, target):
                 next_gen[(pt, tool)] = wait_remaining - 1
                 continue
 
-            if pt == target:
-                if tool == TORCH:
-                    return length
-                return length + 7
+            if pt == maze.target and tool == TORCH:
+                return length
+
+            been.add((pt, tool))
 
             pt_kind = maze.region_kind(pt)
             other_tool = next(iter(ALLOWED[pt_kind].difference({tool})))
             if (pt, other_tool) not in been:
-                next_gen[(pt, other_tool)] = (
-                    6  # this iteration counts as our first minute of wait
-                )
-                been.add((pt, other_tool))
+                # this iteration counts as our first minute of wait
+                next_gen[(pt, other_tool)] = next_gen.get((pt, other_tool), 6)
 
             for neighbor in neighbors(pt):
                 neighbor_kind = maze.region_kind(neighbor)
@@ -91,7 +87,6 @@ def fastest_route(maze, target):
                 if tool in neighbor_tools:
                     if (neighbor, tool) not in been:
                         next_gen[(neighbor, tool)] = 0
-                        been.add((neighbor, tool))
 
         length += 1
         gen = next_gen
@@ -99,12 +94,12 @@ def fastest_route(maze, target):
 
 def neighbors(pt):
     x, y = pt
-    n = {(x + 1, y), (x, y + 1)}
+    yield (x + 1, y)
+    yield (x, y + 1)
     if x > 0:
-        n.add((x - 1, y))
+        yield (x - 1, y)
     if y > 0:
-        n.add((x, y - 1))
-    return n
+        yield (x, y - 1)
 
 
 if __name__ == "__main__":
