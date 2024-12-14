@@ -60,26 +60,30 @@ ALLOWED = {ROCKY: {TORCH, GEAR}, WET: {GEAR, NEITHER}, NARROW: {TORCH, NEITHER}}
 
 
 def fastest_route(maze):
-    gen = {((0, 0), TORCH): 0}
+    gen = {(maze.target, TORCH): 0}
     been = set()
     length = 0
     while True:
         next_gen = dict()
         for (pt, tool), wait_remaining in gen.items():
-            if wait_remaining > 0:
+            if wait_remaining > 0 and (pt, tool) not in next_gen:
                 next_gen[(pt, tool)] = wait_remaining - 1
                 continue
 
-            if pt == maze.target and tool == TORCH:
+        for (pt, tool), wait_remaining in gen.items():
+            if wait_remaining > 0:
+                continue
+
+            if pt == (0, 0) and tool == TORCH:
                 return length
 
             been.add((pt, tool))
 
             pt_kind = maze.region_kind(pt)
             other_tool = next(iter(ALLOWED[pt_kind].difference({tool})))
-            if (pt, other_tool) not in been:
+            if (pt, other_tool) not in been and (pt, other_tool) not in next_gen:
                 # this iteration counts as our first minute of wait
-                next_gen[(pt, other_tool)] = next_gen.get((pt, other_tool), 6)
+                next_gen[(pt, other_tool)] = 6
 
             for neighbor in neighbors(pt):
                 neighbor_kind = maze.region_kind(neighbor)
