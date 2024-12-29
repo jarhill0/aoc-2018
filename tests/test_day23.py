@@ -18,7 +18,7 @@ pos=<1,3,1>, r=1"""
 )
 
 
-class TestDay22(unittest.TestCase):
+class TestDay23(unittest.TestCase):
     def test_part_a(self):
         self.assertEqual(7, day23.part_a(EXAMPLE))
         self.assertEqual(232, day23.part_a(INPUT))
