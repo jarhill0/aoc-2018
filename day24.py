@@ -58,11 +58,6 @@ def fight(immune, infection):
         a = immune if kind == IMMUNE else infection
         a[ind] = v
 
-    def delete(k):
-        kind, ind = k
-        a = immune if kind == IMMUNE else infection
-        del a[ind]
-
     while immune and infection:
         keys = [(IMMUNE, i) for i, x in enumerate(immune) if x is not None] + [
             (INFECTION, i) for i, x in enumerate(infection) if x is not None
@@ -111,6 +106,7 @@ def fight(immune, infection):
         # ------
         # attack
         # ------
+        damage_done = False
         for atk_key in sorted(keys, key=lambda k: get(k).init, reverse=True):
             if get(atk_key) is None:
                 continue
@@ -120,6 +116,9 @@ def fight(immune, infection):
             tgt_key = targets[atk_key]
             target = get(tgt_key)
             units_killed = damage_to(get(atk_key), target) // target.hp
+            if units_killed == 0:
+                continue
+            damage_done = True
             if units_killed >= target.count:
                 sett(tgt_key, None)
             else:
@@ -132,6 +131,9 @@ def fight(immune, infection):
             immune.remove(None)
         while None in infection:
             infection.remove(None)
+
+        if not damage_done:
+            return  # stalemate
 
 
 def damage_to(attacker, target):
@@ -146,7 +148,16 @@ def damage_to(attacker, target):
 
 
 def part_b(inp):
-    pass
+    orig_immune, orig_infection = parse(inp)
+
+    boost = 1
+    while True:
+        immune = [u._replace(atk=u.atk + boost) for u in orig_immune]
+        infection = list(orig_infection)
+        fight(immune, infection)
+        if immune and not infection:
+            return sum(u.count for u in immune)
+        boost += 1
 
 
 if __name__ == "__main__":

@@ -23,8 +23,8 @@ class TestDay24(unittest.TestCase):
         self.assertEqual(26937, day24.part_a(INPUT))
 
     def test_part_b(self):
-        self.assertEqual(None, day24.part_b(EXAMPLE))
-        # self.assertEqual(None, day24.part_b(INPUT))
+        self.assertEqual(51, day24.part_b(EXAMPLE))
+        self.assertEqual(4893, day24.part_b(INPUT))
 
 
 if __name__ == "__main__":
